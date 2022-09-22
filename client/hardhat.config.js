@@ -25,7 +25,6 @@ const getEnv = (variable, optional = false) => {
   return process.env[variable]?.replace(/\\n/gm, "\n")
 }
 
-// Your mnemomic key
 const PRIVATE_KEY = getEnv("PRIVATE_KEY")
 
 // You need to export an object to set up your config
