@@ -16,10 +16,15 @@ contract CNSRegistry is ERC721URIStorage {
     // Magic given to us by OpenZeppelin to help us keep track of tokenIds.
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+    struct CName {
+        address owner;
+        bool listed;
+        uint256 price;
+        uint256 sold;
+        address[] favorites;
+    }
     event Registered(address indexed who, string name);
-
-    mapping(address => string) public names;
-    mapping(string => address) public owners;
+    mapping(uint256 => CName) public CNames;
 
     // This is our SVG code. All we need to change is the name that's displayed. Everything else stays the same.
     // So, we make a baseSvg variable here that all our NFTs can use.
@@ -36,11 +41,10 @@ contract CNSRegistry is ERC721URIStorage {
     constructor() ERC721("ENSRegistry", "ENSR") {}
 
     // A function used to reserve the ENS names
-    function makeAnEpicNFT(string memory _name, string memory _bgColor) public {
-        require(owners[_name] == address(0), "Name Already taken");
-
+    function reserveName(string memory _name, string memory _bgColor) public {
         // Get the current tokenId, this starts at 0.
-        uint256 newItemId = _tokenIds.current();
+        uint256 newTokenId = _tokenIds.current();
+        require(CName[newTokenId].owner == address(0), "Name Already taken");
 
         string memory finalSvg = string(
             abi.encodePacked(
@@ -75,16 +79,28 @@ contract CNSRegistry is ERC721URIStorage {
             abi.encodePacked("data:application/json;base64,", json) // so here we put it all together
         );
         // Actually mint the NFT to the sender using msg.sender.
-        _safeMint(msg.sender, newItemId);
+        _safeMint(msg.sender, newTokenId);
 
         //  Updated our URI to be consistent with our Json files
-        _setTokenURI(newItemId, finalTokenUri);
-
-        owners[_name] = msg.sender; //updating mapping
-        names[msg.sender] = _name; //updating mapping
+        _setTokenURI(newTokenId, finalTokenUri);
+        CName storage newCName = CNames[newTokenId];
+        newCName.owner = msg.sender;
+        newCName.listed = false;
+        newCName.price = 0;
+        newCName.sold = 0;
 
         // Increment the counter for when the next NFT is minted.
         _tokenIds.increment();
-        emit Registered(msg.sender, name);
+        emit Registered(msg.sender, _name);
+    }
+
+    function list(uint256 _tokenId, uint256 _price) public {
+        require(
+            CNames[_tokenId].owner == msg.sender,
+            "Only NFT owner can list Item"
+        );
+        CName storage editCName = CNames[_tokenId];
+        editCName.listed = !editCName.listed;
+        editCName.price = _price;
     }
 }
