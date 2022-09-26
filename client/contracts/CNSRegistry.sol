@@ -130,11 +130,15 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         favorited[_tokenId] = msg.sender;
     }
 
-    function setAddressAvicon(string _imageUri) public {
+    function setAddressAvicon(string memory _imageUri) public {
         imageToAddress[msg.sender] = _imageUri;
     }
 
-    function getAddressAvicon(address _address) public view returns (string) {
+    function getAddressAvicon(address _address)
+        public
+        view
+        returns (string memory)
+    {
         string memory _imageUri = imageToAddress[_address];
         return _imageUri;
     }
