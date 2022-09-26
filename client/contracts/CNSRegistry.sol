@@ -110,16 +110,18 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
             CNames[_tokenId].owner == msg.sender,
             "Only NFT owner can list Item"
         );
+        require(_price > 0, "price should be greater than zero");
         CName storage editCName = CNames[_tokenId];
         editCName.listed = true;
         editCName.price = _price;
     }
 
-    function buy(uint256 _tokenId) public payable {
+    function buyNFT(uint256 _tokenId) public payable {
         require(
             CNames[_tokenId].owner != msg.sender,
             "Owner can not buy own item"
         );
+        require(CNames[_tokenId].listed == true, "nft not listed");
         require(
             CNames[_tokenId].price <= msg.value,
             "insufficient funds to purchase item"
@@ -132,6 +134,7 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
 
         CName storage buyCName = CNames[_tokenId];
         buyCName.owner = msg.sender;
+        buyCName.listed = false;
         buyCName.sold += 1;
     }
 
