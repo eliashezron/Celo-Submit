@@ -23,8 +23,10 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         uint256 sold;
         address[] favorites;
     }
-    event Registered(address indexed who, string name);
     mapping(uint256 => CName) public CNames;
+    mapping(uint256 => address) public favorited;
+
+    event Registered(address indexed who, string name);
 
     // This is our SVG code. All we need to change is the name that's displayed. Everything else stays the same.
     // So, we make a baseSvg variable here that all our NFTs can use.
@@ -33,9 +35,6 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 24px; }</style><rect width='100%' height='100%' fill='";
     string svgPartTwo =
         "'/><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
-
-    //magical events
-    event NewEpicNFTMinted(address sender, uint256 tokenId);
 
     // We need to pass the name of our NFTs token and it's symbol.
     constructor() ERC721("ENSRegistry", "ENSR") {}
@@ -116,11 +115,19 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
 
         (bool success, ) = payable(CNames[_tokenId].owner).call{
             value: msg.value
-        }("");
-        if (success) _transfer(CNames[_tokenId].owner, msg.sender, _tokenId);
+        }(""); // pay for the nft
+        if (success) _transfer(CNames[_tokenId].owner, msg.sender, _tokenId); // transfer nft
 
         CName storage buyCName = CNames[_tokenId];
         buyCName.owner = msg.sender;
+        buyCName.sold += 1;
+    }
+
+    function likeNft(uint256 _tokenId) public {
+        require(favorited[_tokenId] != msg.sender, "nft already favorited");
+        CName storage likeCName = CNames[_tokenId];
+        likeCName.favorites.push(msg.sender);
+        favorited[_tokenId] = msg.sender;
     }
 
     // The following functions are overrides required by Solidity.
