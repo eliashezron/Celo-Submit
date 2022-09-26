@@ -1,13 +1,13 @@
 const hre = require("hardhat")
 
 async function main() {
-  const MyNFT = await hre.ethers.getContractFactory("MyNFT")
-  const myNFT = await MyNFT.deploy()
+  const MyCNS = await hre.ethers.getContractFactory("CNSRegistry")
+  const myCNS = await MyCNS.deploy()
 
-  await myNFT.deployed()
+  await myCNS.deployed()
 
-  console.log("MyNFT deployed to:", myNFT.address)
-  storeContractData(myNFT)
+  console.log("MyNFT deployed to:", myCNS.address)
+  storeContractData(myCNS)
 }
 
 function storeContractData(contract) {
@@ -23,11 +23,11 @@ function storeContractData(contract) {
     JSON.stringify({ MyNFT: contract.address }, undefined, 2)
   )
 
-  const MyNFTArtifact = artifacts.readArtifactSync("MyNFT")
+  const CNSRegistryArtifact = artifacts.readArtifactSync("CNSRegistry")
 
   fs.writeFileSync(
     contractsDir + "/MyNFT.json",
-    JSON.stringify(MyNFTArtifact, null, 2)
+    JSON.stringify(CNSRegistryArtifact, null, 2)
   )
 }
 
