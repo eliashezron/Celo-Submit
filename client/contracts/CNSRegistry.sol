@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 // We first import some OpenZeppelin Contracts.
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "hardhat/console.sol";
@@ -12,7 +13,7 @@ import "hardhat/console.sol";
 // We inherit the contract we imported. This means we'll have access
 // to the inherited contract's methods. So 'is' keyword gives it power
 // to inherit other contracts
-contract CNSRegistry is ERC721, ERC721URIStorage {
+contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
     // Magic given to us by OpenZeppelin to help us keep track of tokenIds.
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -24,6 +25,7 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         address[] favorites;
     }
     mapping(uint256 => CName) public CNames;
+    mapping(string => address) public registeredNames;
     mapping(uint256 => address) public favorited;
     mapping(address => string) public imageToAddress;
     event Registered(address indexed who, string name);
@@ -42,8 +44,7 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
     // A function used to reserve the ENS names
     function reserveName(string memory _name, string memory _bgColor) public {
         // Get the current tokenId, this starts at 0.
-        uint256 newTokenId = _tokenIds.current();
-        require(CNames[newTokenId].owner == address(0), "Name Already taken");
+        require(registeredNames[_name] == address(0), "Name Already taken");
 
         string memory finalSvg = string(
             abi.encodePacked(
@@ -77,7 +78,18 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         string memory finalTokenUri = string(
             abi.encodePacked("data:application/json;base64,", json) // so here we put it all together
         );
+        /** 
+        console.log(
+            string(
+                abi.encodePacked( // passed it in as a parameter
+                    "https://nftpreview.0xdev.codes/?code=", // with this we can do a quick preview of the image and the contents of the json without deploying it again and again on the opensea testnet
+                    finalTokenUri
+                )
+            )
+        );
+        */
         // Actually mint the NFT to the sender using msg.sender.
+        uint256 newTokenId = _tokenIds.current();
         _safeMint(msg.sender, newTokenId);
 
         //  Updated our URI to be consistent with our Json files
@@ -87,7 +99,7 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         newCName.listed = false;
         newCName.price = 0;
         newCName.sold = 0;
-
+        registeredNames[_name] = msg.sender;
         // Increment the counter for when the next NFT is minted.
         _tokenIds.increment();
         emit Registered(msg.sender, _name);
@@ -123,6 +135,27 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         buyCName.sold += 1;
     }
 
+    function getNft(uint256 _tokenId)
+        public
+        view
+        returns (
+            address,
+            bool,
+            uint256,
+            uint256,
+            address[] memory
+        )
+    {
+        CName storage rCName = CNames[_tokenId];
+        return (
+            rCName.owner,
+            rCName.listed,
+            rCName.price,
+            rCName.sold,
+            rCName.favorites
+        );
+    }
+
     function likeNft(uint256 _tokenId) public {
         require(favorited[_tokenId] != msg.sender, "nft already favorited");
         CName storage likeCName = CNames[_tokenId];
@@ -145,6 +178,14 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
 
     // The following functions are overrides required by Solidity.
 
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
     function _burn(uint256 tokenId)
         internal
         override(ERC721, ERC721URIStorage)
@@ -159,5 +200,14 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         returns (string memory)
     {
         return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }
