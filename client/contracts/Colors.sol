@@ -94,14 +94,33 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
         emit Registered(msg.sender, _name);
     }
 
-    function list(uint256 _tokenId, uint256 _price) public {
+    function sell(uint256 _tokenId, uint256 _price) public {
         require(
             CNames[_tokenId].owner == msg.sender,
             "Only NFT owner can list Item"
         );
         CName storage editCName = CNames[_tokenId];
-        editCName.listed = !editCName.listed;
+        editCName.listed = true;
         editCName.price = _price;
+    }
+
+    function buy(uint256 _tokenId) public payable {
+        require(
+            CNames[_tokenId].owner != msg.sender,
+            "Owner can not buy own item"
+        );
+        require(
+            CNames[_tokenId].price <= msg.value,
+            "insufficient funds to purchase item"
+        );
+
+        (bool success, ) = payable(CNames[_tokenId].owner).call{
+            value: msg.value
+        }("");
+        if (success) _transfer(CNames[_tokenId].owner, msg.sender, _tokenId);
+
+        CName storage buyCName = CNames[_tokenId];
+        buyCName.owner = msg.sender;
     }
 
     // The following functions are overrides required by Solidity.
