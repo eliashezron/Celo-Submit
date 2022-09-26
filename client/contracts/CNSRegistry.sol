@@ -25,7 +25,7 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
     }
     mapping(uint256 => CName) public CNames;
     mapping(uint256 => address) public favorited;
-    mapping(string => address) public imageToAddress;
+    mapping(address => string) public imageToAddress;
     event Registered(address indexed who, string name);
 
     // This is our SVG code. All we need to change is the name that's displayed. Everything else stays the same.
@@ -131,11 +131,12 @@ contract CNSRegistry is ERC721, ERC721URIStorage {
     }
 
     function setAddressAvicon(string _imageUri) public {
-        imageToAddress[_imageUri] = msg.sender;
+        imageToAddress[msg.sender] = _imageUri;
     }
 
-    function getAddressAvicon() public view returns (string) {
-        imageToAddress[_imageUri] = msg.sender;
+    function getAddressAvicon(address _address) public view returns (string) {
+        string memory _imageUri = imageToAddress[_address];
+        return _imageUri;
     }
 
     // The following functions are overrides required by Solidity.
