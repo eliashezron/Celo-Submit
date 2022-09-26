@@ -12,7 +12,7 @@ import "hardhat/console.sol";
 // We inherit the contract we imported. This means we'll have access
 // to the inherited contract's methods. So 'is' keyword gives it power
 // to inherit other contracts
-contract CNSRegistry is ERC721URIStorage {
+contract CNSRegistry is ERC721, ERC721URIStorage {
     // Magic given to us by OpenZeppelin to help us keep track of tokenIds.
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -44,7 +44,7 @@ contract CNSRegistry is ERC721URIStorage {
     function reserveName(string memory _name, string memory _bgColor) public {
         // Get the current tokenId, this starts at 0.
         uint256 newTokenId = _tokenIds.current();
-        require(CName[newTokenId].owner == address(0), "Name Already taken");
+        require(CNames[newTokenId].owner == address(0), "Name Already taken");
 
         string memory finalSvg = string(
             abi.encodePacked(
@@ -102,5 +102,23 @@ contract CNSRegistry is ERC721URIStorage {
         CName storage editCName = CNames[_tokenId];
         editCName.listed = !editCName.listed;
         editCName.price = _price;
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function _burn(uint256 tokenId)
+        internal
+        override(ERC721, ERC721URIStorage)
+    {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
     }
 }
