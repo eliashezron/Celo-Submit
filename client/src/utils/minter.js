@@ -111,11 +111,11 @@ export const fetchNftOwner = async (minterContract, index) => {
   }
 }
 
-// export const fetchNftContractOwner = async (minterContract) => {
-//   try {
-//     let owner = await minterContract.methods.owner().call()
-//     return owner
-//   } catch (e) {
-//     console.log({ e })
-//   }
-// }
+export const hasAvicon = async (minterContract, user) => {
+  try {
+    let avicon = await minterContract.methods.getAddressAvicon(user).call()
+    return avicon
+  } catch (e) {
+    console.log({ e })
+  }
+}
