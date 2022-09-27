@@ -1,0 +1,320 @@
+.hero_card{
+	width: 43%;
+	height: 60%;
+	margin-left: 690px;
+	bottom: 450px;
+	cursor: pointer;
+	border-radius: 15px;
+	position: relative;
+	border: none;
+	/* border-radius: 25px 25px 25px 25px; */
+}
+
+.hero_section{
+	position: absolute;
+	background-image: url("https://images.pexels.com/photos/2395253/pexels-photo-2395253.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500");
+	background-repeat: no-repeat;
+    background-size: 100% 60%;
+	border-bottom: none;
+}
+
+.hero_left{
+	margin-top: 200px;
+	margin-left:70px ;
+}
+
+.main_text{
+	font-weight: 900;
+	margin-bottom: 20px;
+}
+
+.muted_text{
+	font-weight:400;
+	font-size: 25px;
+	color: #333232;
+	line-height: 1.5;
+	margin-bottom: 50px;
+}
+.create_btn{
+	margin-left: 20px;
+	width: 170px;
+	border-radius: 10px;
+	cursor: pointer;
+	background-color: white;
+	color: rgb(0, 140, 255);
+	font-weight: 600;
+}
+
+.create_btn:hover{
+	background-color: white;
+	color: rgb(0, 140, 255);	
+}
+
+.explore_btn{
+	width: 170px;
+	border-radius: 10px;
+	cursor: pointer;
+	font-weight: 600;
+}
+
+
+
+.hero_img{
+	object-fit: contain;
+	border-top-left-radius: 15px;
+	border-top-right-radius: 15px;
+	border: none;
+}
+.hero_profile{
+	border-radius: 50%;
+	height: 48px;
+	width: 48px;
+	cursor: pointer;
+}
+
+.card_box{
+	position: relative;
+}
+
+.art_name{
+	position: absolute;
+	font-size: 17px;
+	bottom: 15px;
+    right: 5px;
+	left: 65px;
+	cursor: pointer;
+}
+
+.profile_name{
+	position: absolute;
+	font-size: 17px;
+	bottom: -8px;
+    right: 5px;
+	left: 65px;
+	color: rgb(0, 140, 255);
+	cursor: pointer;
+}
+
+.info_icon{
+	height:20px;
+	width:20px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	cursor: pointer;
+}
+
+/* .hero_tooltip{
+	font-size: 15px;
+	font-weight: 700;
+	white-space: nowrap;
+	display: inline-block;
+    height: auto;
+} */
+
+.hero_btn{
+	position: relative;
+	top: 54px;
+}
+
+.play_btn{
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	margin-top: 40px;
+}
+.play_text{
+	position: absolute;
+	font-size: 17px;
+	font-weight: 600;
+	bottom: 2px;
+    right: 3px;
+	left: 65px;
+	cursor: pointer;
+	color: rgb(0, 140, 255);
+}
+
+.hero_card:hover{
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+ @media only screen and (min-width: 768px) and (max-width: 1024px){
+	.hero_section{
+		width: 1212px;
+		background-repeat: no-repeat;
+		background-size: 100% 100%;
+		border-bottom: none;
+
+	}
+
+
+	.hero_card{
+		width: 50%;
+		height: 100%;
+		margin-left: 280px;
+		top: -60px;
+		border: none;
+		box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+	}
+
+ 
+
+	.hero_img{
+		border-bottom-left-radius: 15px;
+	    border-bottom-right-radius: 15px;
+	    border: none;
+
+	}
+
+	.hero_left{
+		margin-left: 255px;
+		position: relative;
+		bottom: 50px;
+		text-align: center;
+	}
+
+	.main_text{
+		font-size: 50px;
+		margin-right: 80px;
+	}
+
+	.muted_text{
+		font-size: 38px;
+		margin-bottom: 10px;
+		margin-right: 80px;
+	}
+
+	.create_btn{
+		width: 140px;
+		height: 60px;
+		margin-right: 80px;
+	}
+
+	.explore_btn{
+		width: 140px;
+		height: 60px;
+	}
+
+	.heroSection_card{
+		display: none;
+	}
+
+	.hero_btn{
+		top: 500px;
+		z-index: 9;
+		margin-left: 380px;
+
+	}
+
+	.play_btn{
+		width: 50px;
+		height: 50px;
+	}
+
+	.play_icon{
+		width: 35px;
+		right: 3px;
+		position: relative;
+	}
+
+	.play_text{
+		font-size: 22px;
+		font-weight: 700;
+	}	
+
+} 
+
+/* mobile */
+@media only screen 
+    and (width : 375px) 
+    and (height : 812px)
+    and (orientation : portrait)  
+    and (-webkit-device-pixel-ratio : 3){
+		.hero_section{
+			width: 1560px;
+			height: 3000px;
+			background-size: 100% 100%;	
+		}
+
+		.hero_card{
+			width: 80%;
+			height: 100px;
+			margin-left: 120px;
+			top: 450px;
+			border: none;
+			box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+		}
+
+		.heroSection_card{
+			display: none;
+			border: none;
+		}
+
+		.hero_img{
+			border-bottom-left-radius: 15px;
+			border-bottom-right-radius: 15px;			
+			border: none;	
+		}
+
+		.hero_left{
+			margin-left: 5px;
+			position: relative;
+			top: 200px;
+			text-align: center;
+		}
+
+		.main_text{
+			font-size: 130px;
+			margin-left: -40px;
+		}
+	
+		.muted_text{
+			font-size: 80px;
+			margin-bottom: -40px;
+		}
+	
+		.create_btn{
+			width: 350px;
+			height: 150px;
+			font-size: 70px;
+			margin-top: 50px;
+			border-radius: 10px;
+		}
+	
+		.explore_btn{
+			width: 350px;
+			height: 150px;
+			font-size: 70px;
+			margin-top: 50px;
+			border: none;
+			border-radius: 10px;
+
+		}
+
+		.hero_btn{
+			top: 1500px;
+			z-index: 9;
+			margin-left: 350px;	
+		}
+
+		.play_btn{
+			width: 100px;
+			height: 100px;
+		}
+
+		.play_icon{
+			width: 80px;
+			bottom: 15px;
+			right: 18px;
+			position: relative;
+		}
+
+		.play_text{
+			font-size: 50px;
+			font-weight: 700;
+			margin-left: 60px;
+		}	
+
+
+
+}

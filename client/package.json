@@ -5,6 +5,9 @@
   "dependencies": {
     "@celo-tools/use-contractkit": "3.0.0-beta2",
     "@celo/contractkit": "^1.5.2",
+    "@coreui/icons": "^2.1.0",
+    "@coreui/icons-react": "^2.1.0",
+    "@coreui/react": "^4.4.0",
     "@metamask/jazzicon": "^2.0.0",
     "@openzeppelin/contracts": "^4.7.3",
     "@popperjs/core": "^2.10.2",
