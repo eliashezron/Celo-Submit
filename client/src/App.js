@@ -31,14 +31,14 @@ const App = function AppWrapper() {
           </Nav>
           <main>
             <Nfts
-              name='GEO Collection'
+              name='CNS Collection'
               updateBalance={getBalance}
               minterContract={minterContract}
             />
           </main>
         </Container>
       ) : (
-        <Cover name='GEO Collection' coverImg={coverImg} connect={connect} />
+        <Cover name='CNS Collection' coverImg={coverImg} connect={connect} />
       )}
     </>
   )

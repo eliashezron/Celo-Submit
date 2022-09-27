@@ -1,16 +1,6 @@
-// import { create } from "ipfs-http-client"
-// import process from 'process'
-// import minimist from 'minimist'
 import { Web3Storage } from "web3.storage/dist/bundle.esm.min.js"
-// import { NFTStorage } from "nft.storage"
-// import mime from "mime"
 import axios from "axios"
-// const client = create({ url: "https://ipfs.infura.io:5001/api/v0" })
-// ...
 
-// const NFT_STORAGE_TOKEN =
-//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGE0MmNiMUVkNUE1M0Q5NTZDODIyQWRmYTREQWQ0ZGM4RkUzQTVERkMiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY2MTAwMTUwNzU3MywibmFtZSI6InRyaWFsMSJ9.zcCKSYdMC3PwwXVYwFsHWCSmvOEP4k9QhtIW8Cf74y8"
-// const client = new NFTStorage({ token: NFT_STORAGE_TOKEN })
 const makeFileObjects = (file) => {
   const blob = new Blob([JSON.stringify(file)], { type: "application/json" })
   const files = [new File([blob], `${file.name}.json`)]
@@ -95,7 +85,6 @@ export const getNfts = async (minterContract) => {
           name: data.name,
           image: data.image,
           description: data.description,
-          attributes: data.attributes,
         })
       })
       nfts.push(nft)
@@ -122,11 +111,11 @@ export const fetchNftOwner = async (minterContract, index) => {
   }
 }
 
-export const fetchNftContractOwner = async (minterContract) => {
-  try {
-    let owner = await minterContract.methods.owner().call()
-    return owner
-  } catch (e) {
-    console.log({ e })
-  }
-}
+// export const fetchNftContractOwner = async (minterContract) => {
+//   try {
+//     let owner = await minterContract.methods.owner().call()
+//     return owner
+//   } catch (e) {
+//     console.log({ e })
+//   }
+// }

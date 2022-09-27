@@ -2,7 +2,7 @@ import React from "react"
 import PropTypes from "prop-types"
 import HeroSection from "./hero"
 
-const Cover = ({ name, coverImg, connect }) => {
+const Cover = ({ name, connect }) => {
   if (name) {
     return <HeroSection connect={connect} />
   }

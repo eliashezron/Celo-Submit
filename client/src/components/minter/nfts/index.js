@@ -6,11 +6,7 @@ import AddNfts from "./Add"
 import Nft from "./Card"
 import Loader from "../../ui/Loader"
 import { NotificationSuccess, NotificationError } from "../../ui/Notifications"
-import {
-  getNfts,
-  createNft,
-  fetchNftContractOwner,
-} from "../../../utils/minter"
+import { getNfts, createNft } from "../../../utils/minter"
 import { Row } from "react-bootstrap"
 // ...
 const NftList = ({ minterContract, name }) => {
@@ -44,22 +40,16 @@ const NftList = ({ minterContract, name }) => {
       setLoading(false)
     }
   }
-  const fetchContractOwner = useCallback(async (minterContract) => {
-    // get the address that deployed the NFT contract
-    const _address = await fetchNftContractOwner(minterContract)
-    setNftOwner(_address)
-  }, [])
 
   useEffect(() => {
     try {
       if (address && minterContract) {
         getAssets()
-        fetchContractOwner(minterContract)
       }
     } catch (error) {
       console.log({ error })
     }
-  }, [minterContract, address, getAssets, fetchContractOwner])
+  }, [minterContract, address, getAssets])
   if (address) {
     return (
       <>
@@ -67,9 +57,7 @@ const NftList = ({ minterContract, name }) => {
           <>
             <div className='d-flex justify-content-between align-items-center mb-4'>
               <h1 className='fs-4 fw-bold mb-0'>{name}</h1>
-              {nftOwner === address ? (
-                <AddNfts save={addNft} address={address} />
-              ) : null}
+              <AddNfts save={addNft} address={address} />
             </div>
             <Row xs={1} sm={2} lg={3} className='g-3  mb-5 g-xl-4 g-xxl-5'>
               {nfts.map((_nft) => (
