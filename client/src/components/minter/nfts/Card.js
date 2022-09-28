@@ -1,10 +1,19 @@
-import React from "react"
+import React, { useState } from "react"
 import PropTypes from "prop-types"
-import { Card, Col, Badge, Stack, Button } from "react-bootstrap"
+import {
+  Card,
+  Col,
+  Badge,
+  Stack,
+  Button,
+  Modal,
+  Form,
+  FloatingLabel,
+} from "react-bootstrap"
 import { truncateAddress } from "../../../utils"
 import Identicon from "../../ui/Identicon"
 
-const NftCard = ({ nft, minterContract, address }) => {
+const NftCard = ({ nft, minterContract, address, list }) => {
   const {
     image,
     description,
@@ -16,7 +25,11 @@ const NftCard = ({ nft, minterContract, address }) => {
     sold,
     price,
   } = nft
-
+  const [sellPrice, setSellPrice] = useState(0)
+  const [show, setShow] = useState(false)
+  const handleShow = () => setShow(true)
+  const handleClose = () => setShow(false)
+  const isPriceEntered = () => sellPrice
   return (
     <Col key={index}>
       <Card className=' h-100'>
@@ -55,7 +68,51 @@ const NftCard = ({ nft, minterContract, address }) => {
           </Stack>
           <Card.Text className='flex-grow-1'>{description}</Card.Text>
           {address === owner && !listed ? (
-            <Button>List</Button>
+            <>
+              <Button onClick={handleShow}>List</Button>
+              <Modal show={show} onHide={handleClose} centered>
+                <Modal.Header closeButton>
+                  <Modal.Title>First Upload Address Avicon</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                  <Form>
+                    <Form.Label>
+                      <h5>Enter Price Sell Price</h5>
+                    </Form.Label>
+                    <FloatingLabel
+                      controlId='inputPrice'
+                      label='Name'
+                      className='mb-3'
+                    >
+                      <Form.Control
+                        type='number'
+                        placeholder='Enter Sell Price'
+                        onChange={(e) => {
+                          setSellPrice(e.target.value)
+                        }}
+                      />
+                    </FloatingLabel>
+                  </Form>
+                </Modal.Body>
+
+                <Modal.Footer>
+                  <Button variant='outline-secondary' onClick={handleClose}>
+                    Close
+                  </Button>
+                  <Button
+                    variant='dark'
+                    disabled={!isPriceEntered()}
+                    onClick={() => {
+                      list(index, sellPrice)
+                      handleClose()
+                    }}
+                  >
+                    LIst Name
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            </>
           ) : (
             <>
               <Button disabled={owner}> Like</Button>

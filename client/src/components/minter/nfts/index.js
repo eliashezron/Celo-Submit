@@ -6,7 +6,7 @@ import AddNfts from "./Add"
 import Nft from "./Card"
 import Loader from "../../ui/Loader"
 import { NotificationSuccess, NotificationError } from "../../ui/Notifications"
-import { getNfts, createNft, setAvicon } from "../../../utils/minter"
+import { getNfts, createNft, setAvicon, listCNS } from "../../../utils/minter"
 import { Row } from "react-bootstrap"
 // ...
 const NftList = ({ minterContract, name }) => {
@@ -55,6 +55,20 @@ const NftList = ({ minterContract, name }) => {
       setLoading(false)
     }
   }
+  const listName = async (index, price) => {
+    try {
+      setLoading(true)
+      await listCNS(minterContract, performActions, index, price)
+      toast(<NotificationSuccess text='listing Item....' />)
+      toast(<NotificationSuccess text='Item listed....' />)
+      getAssets()
+    } catch (error) {
+      console.log({ error })
+      toast(<NotificationError text='Transaction Failed.' />)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     try {
@@ -83,6 +97,7 @@ const NftList = ({ minterContract, name }) => {
               {nfts.map((_nft) => (
                 <Nft
                   minterContract={minterContract}
+                  list={listName}
                   address={address}
                   key={_nft.index}
                   nft={{
