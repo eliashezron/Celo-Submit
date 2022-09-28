@@ -1,18 +1,32 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import PropTypes from "prop-types"
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap"
 import { uploadFileToWebStorage } from "../../../utils/minter"
+import { hasAvicon } from "../../../utils/minter"
 
 const COLORS = ["Red", "Green", "Blue", "Cyan", "Yellow", "Purple"]
 const SHAPES = ["Circle", "Square", "Triangle"]
 
-const AddNfts = ({ save, address }) => {
+const AddNfts = ({ save, address, minterContract }) => {
   const [name, setName] = useState("")
   const [ipfsImage, setIpfsImage] = useState("")
   const [description, setDescription] = useState("")
   const [attributes, setAttributes] = useState([])
   const [show, setShow] = useState(false)
-
+  const { avi, setAvi } = useState(null)
+  const getUserAvi = useCallback(async (minterContract, address) => {
+    // get the address that deployed the NFT contract
+    const avicon = await hasAvicon(minterContract, address)
+    if (avicon.length > 0) {
+      setAvi(avicon)
+    }
+    // eslint-disable-next-line
+  }, [])
+  useEffect(() => {
+    if (address && minterContract) {
+      getUserAvi(minterContract, address)
+    }
+  }, [address, minterContract, getUserAvi])
   // check if all form data has been filled
   const isFormFilled = () =>
     name && ipfsImage && description && attributes.length > 2
@@ -62,141 +76,186 @@ const AddNfts = ({ save, address }) => {
       >
         <i className='bi bi-plus'></i>
       </Button>
+      {!avi ? (
+        <Modal show={show} onHide={handleClose} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Upload Address Avicon</Modal.Title>
+          </Modal.Header>
 
-      {/* Modal */}
-      <Modal show={show} onHide={handleClose} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Create NFT</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          <Form>
-            <FloatingLabel
-              controlId='inputLocation'
-              label='Name'
-              className='mb-3'
-            >
+          <Modal.Body>
+            <Form>
+              <Form.Label>
+                <h5>Upload image</h5>
+              </Form.Label>
               <Form.Control
-                type='text'
-                placeholder='Name of NFT'
-                onChange={(e) => {
-                  setName(e.target.value)
+                type='file'
+                className={"mb-3"}
+                onChange={async (e) => {
+                  const imageUrl = await uploadFileToWebStorage(e)
+                  if (!imageUrl) {
+                    alert("failed to upload image")
+                    return
+                  }
+                  setIpfsImage(imageUrl)
                 }}
-              />
-            </FloatingLabel>
+                placeholder='Product name'
+              ></Form.Control>
+            </Form>
+          </Modal.Body>
 
-            <FloatingLabel
-              controlId='inputDescription'
-              label='Description'
-              className='mb-3'
+          <Modal.Footer>
+            <Button variant='outline-secondary' onClick={handleClose}>
+              Close
+            </Button>
+            <Button
+              variant='dark'
+              disabled={!isFormFilled()}
+              onClick={() => {
+                save({
+                  ipfsImage,
+                })
+                handleClose()
+              }}
             >
+              Create Avicon
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      ) : (
+        <Modal show={show} onHide={handleClose} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Create NFT</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <Form>
+              <FloatingLabel
+                controlId='inputLocation'
+                label='Name'
+                className='mb-3'
+              >
+                <Form.Control
+                  type='text'
+                  placeholder='Name of NFT'
+                  onChange={(e) => {
+                    setName(e.target.value)
+                  }}
+                />
+              </FloatingLabel>
+
+              <FloatingLabel
+                controlId='inputDescription'
+                label='Description'
+                className='mb-3'
+              >
+                <Form.Control
+                  as='textarea'
+                  placeholder='description'
+                  style={{ height: "80px" }}
+                  onChange={(e) => {
+                    setDescription(e.target.value)
+                  }}
+                />
+              </FloatingLabel>
+
               <Form.Control
-                as='textarea'
-                placeholder='description'
-                style={{ height: "80px" }}
-                onChange={(e) => {
-                  setDescription(e.target.value)
+                type='file'
+                className={"mb-3"}
+                onChange={async (e) => {
+                  const imageUrl = await uploadFileToWebStorage(e)
+                  if (!imageUrl) {
+                    alert("failed to upload image")
+                    return
+                  }
+                  setIpfsImage(imageUrl)
                 }}
-              />
-            </FloatingLabel>
+                placeholder='Product name'
+              ></Form.Control>
+              <Form.Label>
+                <h5>Properties</h5>
+              </Form.Label>
+              <Form.Control
+                as='select'
+                className={"mb-3"}
+                onChange={async (e) => {
+                  setAttributesFunc(e, "background")
+                }}
+                placeholder='Background'
+              >
+                <option hidden>Background</option>
+                {COLORS.map((color) => (
+                  <option
+                    key={`background-${color.toLowerCase()}`}
+                    value={color.toLowerCase()}
+                  >
+                    {color}
+                  </option>
+                ))}
+              </Form.Control>
 
-            <Form.Control
-              type='file'
-              className={"mb-3"}
-              onChange={async (e) => {
-                const imageUrl = await uploadFileToWebStorage(e)
-                if (!imageUrl) {
-                  alert("failed to upload image")
-                  return
-                }
-                setIpfsImage(imageUrl)
+              <Form.Control
+                as='select'
+                className={"mb-3"}
+                onChange={async (e) => {
+                  setAttributesFunc(e, "color")
+                }}
+                placeholder='NFT Color'
+              >
+                <option hidden>Color</option>
+                {COLORS.map((color) => (
+                  <option
+                    key={`color-${color.toLowerCase()}`}
+                    value={color.toLowerCase()}
+                  >
+                    {color}
+                  </option>
+                ))}
+              </Form.Control>
+
+              <Form.Control
+                as='select'
+                className={"mb-3"}
+                onChange={async (e) => {
+                  setAttributesFunc(e, "shape")
+                }}
+                placeholder='NFT Shape'
+              >
+                <option hidden>Shape</option>
+                {SHAPES.map((shape) => (
+                  <option
+                    key={`shape-${shape.toLowerCase()}`}
+                    value={shape.toLowerCase()}
+                  >
+                    {shape}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button variant='outline-secondary' onClick={handleClose}>
+              Close
+            </Button>
+            <Button
+              variant='dark'
+              disabled={!isFormFilled()}
+              onClick={() => {
+                save({
+                  name,
+                  ipfsImage,
+                  description,
+                  ownerAddress: address,
+                  attributes,
+                })
+                handleClose()
               }}
-              placeholder='Product name'
-            ></Form.Control>
-            <Form.Label>
-              <h5>Properties</h5>
-            </Form.Label>
-            <Form.Control
-              as='select'
-              className={"mb-3"}
-              onChange={async (e) => {
-                setAttributesFunc(e, "background")
-              }}
-              placeholder='Background'
             >
-              <option hidden>Background</option>
-              {COLORS.map((color) => (
-                <option
-                  key={`background-${color.toLowerCase()}`}
-                  value={color.toLowerCase()}
-                >
-                  {color}
-                </option>
-              ))}
-            </Form.Control>
-
-            <Form.Control
-              as='select'
-              className={"mb-3"}
-              onChange={async (e) => {
-                setAttributesFunc(e, "color")
-              }}
-              placeholder='NFT Color'
-            >
-              <option hidden>Color</option>
-              {COLORS.map((color) => (
-                <option
-                  key={`color-${color.toLowerCase()}`}
-                  value={color.toLowerCase()}
-                >
-                  {color}
-                </option>
-              ))}
-            </Form.Control>
-
-            <Form.Control
-              as='select'
-              className={"mb-3"}
-              onChange={async (e) => {
-                setAttributesFunc(e, "shape")
-              }}
-              placeholder='NFT Shape'
-            >
-              <option hidden>Shape</option>
-              {SHAPES.map((shape) => (
-                <option
-                  key={`shape-${shape.toLowerCase()}`}
-                  value={shape.toLowerCase()}
-                >
-                  {shape}
-                </option>
-              ))}
-            </Form.Control>
-          </Form>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button variant='outline-secondary' onClick={handleClose}>
-            Close
-          </Button>
-          <Button
-            variant='dark'
-            disabled={!isFormFilled()}
-            onClick={() => {
-              save({
-                name,
-                ipfsImage,
-                description,
-                ownerAddress: address,
-                attributes,
-              })
-              handleClose()
-            }}
-          >
-            Create NFT
-          </Button>
-        </Modal.Footer>
-      </Modal>
+              Create NFT
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </>
   )
 }

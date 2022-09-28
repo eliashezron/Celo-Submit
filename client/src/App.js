@@ -22,6 +22,7 @@ const App = function AppWrapper() {
           <Nav className='justify-content-end pt-3 pb-5'>
             <Nav.Item>
               <Wallet
+                minterContract={minterContract}
                 address={address}
                 amount={balance.CELO}
                 symbol='CELO'
