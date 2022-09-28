@@ -4,14 +4,25 @@ import { Button, Modal, Form, FloatingLabel } from "react-bootstrap"
 import { uploadFileToWebStorage } from "../../../utils/minter"
 import { hasAvicon } from "../../../utils/minter"
 
-const COLORS = ["Red", "Green", "Blue", "Cyan", "Yellow", "Purple"]
-const SHAPES = ["Circle", "Square", "Triangle"]
+const COLORS = [
+  "Black",
+  "Red",
+  "Green",
+  "Grimson",
+  "indigo",
+  "Aqua",
+  "Brown",
+  "Yellow",
+  "Coral",
+  "Orange",
+  "Gold",
+  "Teal",
+]
 
 const AddNfts = ({ save, uploadImage, address, minterContract }) => {
   const [name, setName] = useState("")
   const [ipfsImage, setIpfsImage] = useState("")
-  const [description, setDescription] = useState("")
-  const [attributes, setAttributes] = useState([])
+  const [color, setColor] = useState("")
   const [show, setShow] = useState(false)
   const [avi, setAvi] = useState(null)
   const getUserAvi = useCallback(async (minterContract, address) => {
@@ -26,43 +37,15 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
     }
   }, [address, minterContract, getUserAvi])
   // check if all form data has been filled
-  const isFormFilled = () => name && description && attributes.length > 2
+  const isFormFilled = () => name && color
   const isImageUpload = () => ipfsImage
   // close the popup modal
   const handleClose = () => {
     setShow(false)
-    setAttributes([])
   }
 
   // display the popup modal
   const handleShow = () => setShow(true)
-
-  // add an attribute to an NFT
-  const setAttributesFunc = (e, trait_type) => {
-    const { value } = e.target
-    const attributeObject = {
-      trait_type,
-      value,
-    }
-    const arr = attributes
-
-    // check if attribute already exists
-    const index = arr.findIndex((el) => el.trait_type === trait_type)
-
-    if (index >= 0) {
-      // update the existing attribute
-      arr[index] = {
-        trait_type,
-        value,
-      }
-      setAttributes(arr)
-      return
-    }
-
-    // add a new attribute
-    setAttributes((oldArray) => [...oldArray, attributeObject])
-  }
-
   return (
     <>
       <Button
@@ -74,52 +57,54 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
         <i className='bi bi-plus'></i>
       </Button>
       {!avi ? (
-        <Modal show={show} onHide={handleClose} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Upload Address Avicon</Modal.Title>
-          </Modal.Header>
+        <>
+          <Modal show={show} onHide={handleClose} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>First Upload Address Avicon</Modal.Title>
+            </Modal.Header>
 
-          <Modal.Body>
-            <Form>
-              <Form.Label>
-                <h5>Upload image</h5>
-              </Form.Label>
-              <Form.Control
-                type='file'
-                className={"mb-3"}
-                onChange={async (e) => {
-                  const imageUrl = await uploadFileToWebStorage(e)
-                  if (!imageUrl) {
-                    alert("failed to upload image")
-                    return
-                  }
-                  setIpfsImage(imageUrl)
+            <Modal.Body>
+              <Form>
+                <Form.Label>
+                  <h5>Upload image</h5>
+                </Form.Label>
+                <Form.Control
+                  type='file'
+                  className={"mb-3"}
+                  onChange={async (e) => {
+                    const imageUrl = await uploadFileToWebStorage(e)
+                    if (!imageUrl) {
+                      alert("failed to upload image")
+                      return
+                    }
+                    setIpfsImage(imageUrl)
+                  }}
+                  placeholder='upload Image'
+                ></Form.Control>
+              </Form>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button variant='outline-secondary' onClick={handleClose}>
+                Close
+              </Button>
+              <Button
+                variant='dark'
+                disabled={!isImageUpload()}
+                onClick={() => {
+                  uploadImage(ipfsImage)
+                  handleClose()
                 }}
-                placeholder='upload Image'
-              ></Form.Control>
-            </Form>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button variant='outline-secondary' onClick={handleClose}>
-              Close
-            </Button>
-            <Button
-              variant='dark'
-              disabled={!isImageUpload()}
-              onClick={() => {
-                uploadImage(ipfsImage)
-                handleClose()
-              }}
-            >
-              Create Avicon
-            </Button>
-          </Modal.Footer>
-        </Modal>
+              >
+                Create Avicon
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
       ) : (
         <Modal show={show} onHide={handleClose} centered>
           <Modal.Header closeButton>
-            <Modal.Title>Create NFT</Modal.Title>
+            <Modal.Title>Reserve Your Name</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -133,85 +118,35 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
                   type='text'
                   placeholder='Name of NFT'
                   onChange={(e) => {
-                    setName(e.target.value)
+                    setName(e.target.value.replaceAll(" ", ""))
                   }}
                 />
               </FloatingLabel>
 
               <FloatingLabel
-                controlId='inputDescription'
-                label='Description'
+                controlId='inputColor'
+                label='background color'
                 className='mb-3'
               >
                 <Form.Control
-                  as='textarea'
-                  placeholder='description'
-                  style={{ height: "80px" }}
-                  onChange={(e) => {
-                    setDescription(e.target.value)
+                  as='select'
+                  className={"mb-3"}
+                  onChange={async (e) => {
+                    setColor(e.target.value)
                   }}
-                />
+                  placeholder='NFT Color'
+                >
+                  <option hidden>select Color</option>
+                  {COLORS.map((color) => (
+                    <option
+                      key={`color-${color.toLowerCase()}`}
+                      value={color.toLowerCase()}
+                    >
+                      {color}
+                    </option>
+                  ))}
+                </Form.Control>
               </FloatingLabel>
-
-              <Form.Label>
-                <h5>Properties</h5>
-              </Form.Label>
-              <Form.Control
-                as='select'
-                className={"mb-3"}
-                onChange={async (e) => {
-                  setAttributesFunc(e, "background")
-                }}
-                placeholder='Background'
-              >
-                <option hidden>Background</option>
-                {COLORS.map((color) => (
-                  <option
-                    key={`background-${color.toLowerCase()}`}
-                    value={color.toLowerCase()}
-                  >
-                    {color}
-                  </option>
-                ))}
-              </Form.Control>
-
-              <Form.Control
-                as='select'
-                className={"mb-3"}
-                onChange={async (e) => {
-                  setAttributesFunc(e, "color")
-                }}
-                placeholder='NFT Color'
-              >
-                <option hidden>Color</option>
-                {COLORS.map((color) => (
-                  <option
-                    key={`color-${color.toLowerCase()}`}
-                    value={color.toLowerCase()}
-                  >
-                    {color}
-                  </option>
-                ))}
-              </Form.Control>
-
-              <Form.Control
-                as='select'
-                className={"mb-3"}
-                onChange={async (e) => {
-                  setAttributesFunc(e, "shape")
-                }}
-                placeholder='NFT Shape'
-              >
-                <option hidden>Shape</option>
-                {SHAPES.map((shape) => (
-                  <option
-                    key={`shape-${shape.toLowerCase()}`}
-                    value={shape.toLowerCase()}
-                  >
-                    {shape}
-                  </option>
-                ))}
-              </Form.Control>
             </Form>
           </Modal.Body>
 
@@ -223,13 +158,7 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
               variant='dark'
               disabled={!isFormFilled()}
               onClick={() => {
-                save({
-                  name,
-                  ipfsImage,
-                  description,
-                  ownerAddress: address,
-                  attributes,
-                })
+                save(name, color)
                 handleClose()
               }}
             >

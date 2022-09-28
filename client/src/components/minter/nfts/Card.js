@@ -4,7 +4,7 @@ import { Card, Col, Badge, Stack, Row } from "react-bootstrap"
 import { truncateAddress } from "../../../utils"
 import Identicon from "../../ui/Identicon"
 
-const NftCard = ({ nft }) => {
+const NftCard = ({ nft, minterContract }) => {
   const { image, description, owner, name, index, attributes } = nft
 
   return (
@@ -12,7 +12,11 @@ const NftCard = ({ nft }) => {
       <Card className=' h-100'>
         <Card.Header>
           <Stack direction='horizontal' gap={2}>
-            <Identicon address={owner} size={28} />
+            <Identicon
+              minterContract={minterContract}
+              address={owner}
+              size={28}
+            />
             <span className='font-monospace text-secondary'>
               {truncateAddress(owner)}
             </span>

@@ -26,10 +26,10 @@ const NftList = ({ minterContract, name }) => {
     }
   }, [minterContract])
 
-  const addNft = async (data) => {
+  const addNft = async (name, color) => {
     try {
       setLoading(true)
-      await createNft(minterContract, performActions, data)
+      await createNft(minterContract, performActions, name, color)
       toast(<NotificationSuccess text='Updating NFT list....' />)
       getAssets()
     } catch (error) {
@@ -44,6 +44,10 @@ const NftList = ({ minterContract, name }) => {
       setLoading(true)
       await setAvicon(minterContract, performActions, data)
       toast(<NotificationSuccess text='uploading  Avicon....' />)
+      toast(<NotificationSuccess text='Avicon Uploaded....' />)
+      toast(
+        <NotificationSuccess text='You can now reserve your Name on the celo Blockchain....' />
+      )
     } catch (error) {
       console.log({ error })
       toast(<NotificationError text='Failed update Avicon.' />)
@@ -78,6 +82,7 @@ const NftList = ({ minterContract, name }) => {
             <Row xs={1} sm={2} lg={3} className='g-3  mb-5 g-xl-4 g-xxl-5'>
               {nfts.map((_nft) => (
                 <Nft
+                  minterContract={minterContract}
                   key={_nft.index}
                   nft={{
                     ..._nft,
