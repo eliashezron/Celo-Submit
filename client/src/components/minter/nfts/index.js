@@ -6,7 +6,7 @@ import AddNfts from "./Add"
 import Nft from "./Card"
 import Loader from "../../ui/Loader"
 import { NotificationSuccess, NotificationError } from "../../ui/Notifications"
-import { getNfts, createNft } from "../../../utils/minter"
+import { getNfts, createNft, setAvicon } from "../../../utils/minter"
 import { Row } from "react-bootstrap"
 // ...
 const NftList = ({ minterContract, name }) => {
@@ -39,6 +39,18 @@ const NftList = ({ minterContract, name }) => {
       setLoading(false)
     }
   }
+  const uploadImage = async (data) => {
+    try {
+      setLoading(true)
+      await setAvicon(minterContract, performActions, data)
+      toast(<NotificationSuccess text='uploading  Avicon....' />)
+    } catch (error) {
+      console.log({ error })
+      toast(<NotificationError text='Failed update Avicon.' />)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     try {
@@ -59,6 +71,7 @@ const NftList = ({ minterContract, name }) => {
               <AddNfts
                 minterContract={minterContract}
                 save={addNft}
+                uploadImage={uploadImage}
                 address={address}
               />
             </div>

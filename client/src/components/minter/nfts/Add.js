@@ -7,19 +7,17 @@ import { hasAvicon } from "../../../utils/minter"
 const COLORS = ["Red", "Green", "Blue", "Cyan", "Yellow", "Purple"]
 const SHAPES = ["Circle", "Square", "Triangle"]
 
-const AddNfts = ({ save, address, minterContract }) => {
+const AddNfts = ({ save, uploadImage, address, minterContract }) => {
   const [name, setName] = useState("")
   const [ipfsImage, setIpfsImage] = useState("")
   const [description, setDescription] = useState("")
   const [attributes, setAttributes] = useState([])
   const [show, setShow] = useState(false)
-  const { avi, setAvi } = useState(null)
+  const { avi, setAvi } = useState("")
   const getUserAvi = useCallback(async (minterContract, address) => {
     // get the address that deployed the NFT contract
     const avicon = await hasAvicon(minterContract, address)
-    if (avicon.length > 0) {
-      setAvi(avicon)
-    }
+    setAvi(avicon)
     // eslint-disable-next-line
   }, [])
   useEffect(() => {
@@ -28,9 +26,8 @@ const AddNfts = ({ save, address, minterContract }) => {
     }
   }, [address, minterContract, getUserAvi])
   // check if all form data has been filled
-  const isFormFilled = () =>
-    name && ipfsImage && description && attributes.length > 2
-
+  const isFormFilled = () => name && description && attributes.length > 2
+  const isImageUpload = () => ipfsImage
   // close the popup modal
   const handleClose = () => {
     setShow(false)
@@ -98,7 +95,7 @@ const AddNfts = ({ save, address, minterContract }) => {
                   }
                   setIpfsImage(imageUrl)
                 }}
-                placeholder='Product name'
+                placeholder='upload Image'
               ></Form.Control>
             </Form>
           </Modal.Body>
@@ -109,11 +106,9 @@ const AddNfts = ({ save, address, minterContract }) => {
             </Button>
             <Button
               variant='dark'
-              disabled={!isFormFilled()}
+              disabled={!isImageUpload()}
               onClick={() => {
-                save({
-                  ipfsImage,
-                })
+                uploadImage(ipfsImage)
                 handleClose()
               }}
             >
@@ -158,19 +153,6 @@ const AddNfts = ({ save, address, minterContract }) => {
                 />
               </FloatingLabel>
 
-              <Form.Control
-                type='file'
-                className={"mb-3"}
-                onChange={async (e) => {
-                  const imageUrl = await uploadFileToWebStorage(e)
-                  if (!imageUrl) {
-                    alert("failed to upload image")
-                    return
-                  }
-                  setIpfsImage(imageUrl)
-                }}
-                placeholder='Product name'
-              ></Form.Control>
               <Form.Label>
                 <h5>Properties</h5>
               </Form.Label>
@@ -261,6 +243,7 @@ const AddNfts = ({ save, address, minterContract }) => {
 }
 AddNfts.propTypes = {
   save: PropTypes.func.isRequired,
+  uploadImage: PropTypes.func.isRequired,
   address: PropTypes.string.isRequired,
 }
 

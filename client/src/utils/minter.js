@@ -119,3 +119,17 @@ export const hasAvicon = async (minterContract, user) => {
     console.log({ e })
   }
 }
+export const setAvicon = async (minterContract, performActions, ipfsImage) => {
+  await performActions(async (kit) => {
+    if (!ipfsImage) return
+    const { defaultAccount } = kit
+    try {
+      let avicon = await minterContract.methods
+        .setAddressAvicon(ipfsImage)
+        .send({ from: defaultAccount })
+      return avicon
+    } catch (e) {
+      console.log({ e })
+    }
+  })
+}
