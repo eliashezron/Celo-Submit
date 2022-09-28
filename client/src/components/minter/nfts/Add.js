@@ -13,7 +13,7 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
   const [description, setDescription] = useState("")
   const [attributes, setAttributes] = useState([])
   const [show, setShow] = useState(false)
-  const { avi, setAvi } = useState("")
+  const [avi, setAvi] = useState(null)
   const getUserAvi = useCallback(async (minterContract, address) => {
     // get the address that deployed the NFT contract
     const avicon = await hasAvicon(minterContract, address)

@@ -3,7 +3,7 @@ import Jazzicon from "@metamask/jazzicon"
 import { hasAvicon } from "../../utils/minter"
 export default function Identicon({ minterContract, address, size, ...rest }) {
   const ref = useRef()
-  const { avi, setAvi } = useState(null)
+  const [avi, setAvi] = useState(null)
   const getUserAvi = useCallback(async (minterContract, address) => {
     // get the address that deployed the NFT contract
     const avicon = await hasAvicon(minterContract, address)
@@ -27,12 +27,25 @@ export default function Identicon({ minterContract, address, size, ...rest }) {
   }, [address, size])
 
   return (
-    <div {...rest}>
+    <>
       {avi ? (
-        <div ref={avi} style={{ width: `${size}px`, height: `${size}px` }} />
+        <div>
+          <img
+            src={avi}
+            alt='avi'
+            style={{
+              width: `${size}px`,
+              height: `${size}px`,
+              borderRadius: "25%",
+              marginLeft: "5px",
+            }}
+          ></img>
+        </div>
       ) : (
-        <div ref={ref} style={{ width: `${size}px`, height: `${size}px` }} />
+        <div {...rest}>
+          <div ref={ref} style={{ width: `${size}px`, height: `${size}px` }} />
+        </div>
       )}
-    </div>
+    </>
   )
 }
