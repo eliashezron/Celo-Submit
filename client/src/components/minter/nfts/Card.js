@@ -41,9 +41,29 @@ const NftCard = ({ nft, minterContract, address }) => {
         </div>
 
         <Card.Body className='d-flex  flex-column text-center'>
-          <Card.Title>{name}</Card.Title>
+          <Stack direction='horizontal' gap={2}>
+            <Card.Title>{name}</Card.Title>
+            <Badge bg='secondary' className='ms-auto'>
+              {favorites} Likes
+            </Badge>
+          </Stack>
+          <Stack direction='horizontal' gap={2}>
+            <Card.Title>{price} Celo</Card.Title>
+            <Badge bg='secondary' className='ms-auto'>
+              {sold} Transfers
+            </Badge>
+          </Stack>
           <Card.Text className='flex-grow-1'>{description}</Card.Text>
-          {address === owner ? <Button>List</Button> : <Button>Buy</Button>}
+          {address === owner && !listed ? (
+            <Button>List</Button>
+          ) : (
+            <>
+              <Button disabled={owner}> Like</Button>
+              <Button disabled={owner} className='mt-2'>
+                Buy
+              </Button>
+            </>
+          )}
         </Card.Body>
       </Card>
     </Col>
