@@ -83,6 +83,7 @@ const NftList = ({ minterContract, name }) => {
               {nfts.map((_nft) => (
                 <Nft
                   minterContract={minterContract}
+                  address={address}
                   key={_nft.index}
                   nft={{
                     ..._nft,

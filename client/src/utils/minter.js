@@ -51,6 +51,7 @@ export const getNfts = async (minterContract) => {
     for (let i = 0; i < Number(nftsLength); i++) {
       const nft = new Promise(async (resolve) => {
         const res = await minterContract.methods.tokenURI(i).call()
+        const getProps = await minterContract.methods.getNft(i).call()
         const data = await format_data(res)
         const owner = await await minterContract.methods.ownerOf(i).call()
         resolve({
@@ -59,6 +60,10 @@ export const getNfts = async (minterContract) => {
           name: data.name,
           image: data.image,
           description: data.description,
+          favorites: getProps[4].length,
+          listed: getProps[1],
+          sold: getProps[3],
+          price: getProps[2],
         })
       })
       nfts.push(nft)
@@ -102,6 +107,20 @@ export const setAvicon = async (minterContract, performActions, ipfsImage) => {
         .setAddressAvicon(ipfsImage)
         .send({ from: defaultAccount })
       return avicon
+    } catch (e) {
+      console.log({ e })
+    }
+  })
+}
+export const listCNS = async (minterContract, performActions, index, Price) => {
+  await performActions(async (kit) => {
+    if (!index || !Price) return
+    const { defaultAccount } = kit
+    try {
+      let tx = await minterContract.methods
+        .sell(index, Price)
+        .send({ from: defaultAccount })
+      return tx
     } catch (e) {
       console.log({ e })
     }
