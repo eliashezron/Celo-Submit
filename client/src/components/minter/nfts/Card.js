@@ -12,8 +12,9 @@ import {
 } from "react-bootstrap"
 import { truncateAddress } from "../../../utils"
 import Identicon from "../../ui/Identicon"
+import BigNumber from "bignumber.js"
 
-const NftCard = ({ nft, minterContract, address, list }) => {
+const NftCard = ({ nft, minterContract, address, list, like, buy }) => {
   const {
     image,
     description,
@@ -61,7 +62,7 @@ const NftCard = ({ nft, minterContract, address, list }) => {
             </Badge>
           </Stack>
           <Stack direction='horizontal' gap={2}>
-            <Card.Title>{price} Celo</Card.Title>
+            <Card.Title>{price.shiftedBy(-18).toFixed(2)} Celo</Card.Title>
             <Badge bg='secondary' className='ms-auto'>
               {sold} Transfers
             </Badge>
@@ -104,7 +105,10 @@ const NftCard = ({ nft, minterContract, address, list }) => {
                     variant='dark'
                     disabled={!isPriceEntered()}
                     onClick={() => {
-                      list(index, sellPrice)
+                      list(
+                        index,
+                        new BigNumber(sellPrice).shiftedBy(18).toString()
+                      )
                       handleClose()
                     }}
                   >
@@ -115,8 +119,15 @@ const NftCard = ({ nft, minterContract, address, list }) => {
             </>
           ) : (
             <>
-              <Button disabled={owner}> Like</Button>
-              <Button disabled={owner} className='mt-2'>
+              <Button disabled={address === owner} onClick={() => like(index)}>
+                {" "}
+                Like
+              </Button>
+              <Button
+                disabled={address === owner}
+                onClick={() => buy(index, price)}
+                className='mt-2'
+              >
                 Buy
               </Button>
             </>

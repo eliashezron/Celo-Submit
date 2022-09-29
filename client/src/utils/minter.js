@@ -1,6 +1,6 @@
 import { Web3Storage } from "web3.storage/dist/bundle.esm.min.js"
 import axios from "axios"
-
+import BigNumber from "bignumber.js"
 const client = new Web3Storage({
   token:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEE0MDk2MjJERmU3MDZjNzY3OUExOUM5NzU4Qjc3QzJmN2E4MjlkOTUiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NjIwMjg2MjQwNzYsIm5hbWUiOiJjZWxvTmZ0RGVtbyJ9.VbInbK1Ud2MHgzuOEmgHH-VWQq7XJv9Q0-gdvC-wOOA",
@@ -63,7 +63,7 @@ export const getNfts = async (minterContract) => {
           favorites: getProps[4].length,
           listed: getProps[1],
           sold: getProps[3],
-          price: getProps[2],
+          price: new BigNumber(getProps[2]),
         })
       })
       nfts.push(nft)
@@ -116,9 +116,45 @@ export const listCNS = async (minterContract, performActions, index, Price) => {
   await performActions(async (kit) => {
     if (!index || !Price) return
     const { defaultAccount } = kit
+
     try {
       let tx = await minterContract.methods
         .sell(index, Price)
+        .send({ from: defaultAccount })
+      return tx
+    } catch (e) {
+      console.log({ e })
+    }
+  })
+}
+export const buyCNS = async (
+  minterContract,
+  performActions,
+  index,
+  buyPrice
+) => {
+  await performActions(async (kit) => {
+    if (!index || !buyPrice) return
+    const { defaultAccount } = kit
+
+    try {
+      let tx = await minterContract.methods
+        .buyNFT(index)
+        .send({ from: defaultAccount, value: buyPrice })
+      return tx
+    } catch (e) {
+      console.log({ e })
+    }
+  })
+}
+export const likeCNS = async (minterContract, performActions, index) => {
+  await performActions(async (kit) => {
+    if (!index) return
+    const { defaultAccount } = kit
+
+    try {
+      let tx = await minterContract.methods
+        .likeNft(index)
         .send({ from: defaultAccount })
       return tx
     } catch (e) {
