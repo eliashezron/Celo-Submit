@@ -8,13 +8,13 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
-import "hardhat/console.sol";
+import "hardhat/console.sol"; // to allow console logging for easier debuging
 
-// We inherit the contract we imported. This means we'll have access
+// We inherit the contracts we imported. This means we'll have access
 // to the inherited contract's methods. So 'is' keyword gives it power
 // to inherit other contracts
 contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
-    // Magic given to us by OpenZeppelin to help us keep track of tokenIds.
+    // this allows us to help us keep track of tokenIds.
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     struct CName {
@@ -24,11 +24,11 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         uint256 sold;
         address[] favorites;
     }
-    mapping(uint256 => CName) public CNames;
-    mapping(string => address) public registeredNames;
-    mapping(uint256 => address) public favorited;
-    mapping(address => string) public imageToAddress;
-    event Registered(address indexed who, string name);
+    mapping(uint256 => CName) public CNames; //to keep track of the structs
+    mapping(string => address) public registeredNames; //to  map the registered names to the owners
+    mapping(uint256 => address) public favorited; // to keep track of those that have already liked an nft
+    mapping(address => string) public imageToAddress; // to map the address/users to the avicons
+    event Registered(address indexed who, string name); // emit this upon successfull registration
 
     // This is our SVG code. All we need to change is the name that's displayed. Everything else stays the same.
     // So, we make a baseSvg variable here that all our NFTs can use.
@@ -38,14 +38,14 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
     string svgPartTwo =
         "'/><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
 
-    // We need to pass the name of our NFTs token and it's symbol.
+    // initialising the name and it's symbol of the ERC721 contract.
     constructor() ERC721("ENSRegistry", "ENSR") {}
 
-    // A function used to reserve the ENS names
+    // A function used to reserve the CNS names
     function reserveName(string memory _name, string memory _bgColor) public {
-        // Get the current tokenId, this starts at 0.
+        // query to see if the name is still available
         require(registeredNames[_name] == address(0), "Name Already taken");
-
+        // if yes, we reconstruct the svg to  include the name and bg color
         string memory finalSvg = string(
             abi.encodePacked(
                 svgPartOne,
@@ -55,8 +55,9 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
                 "</text></svg>"
             )
         );
+        //@dev to autofill the .celo extention to the input name
         string memory name = string(abi.encodePacked(_name, ".celo"));
-        console.log(name);
+        // console.log(name)
         // Get all the JSON metadata in place and base64 encode it.
         string memory json = Base64.encode( // this whole block encodes our json data into base64
             bytes(
@@ -94,6 +95,7 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
 
         //  Updated our URI to be consistent with our Json files
         _setTokenURI(newTokenId, finalTokenUri);
+        // updated the struct
         CName storage newCName = CNames[newTokenId];
         newCName.owner = msg.sender;
         newCName.listed = false;
@@ -102,20 +104,24 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         registeredNames[_name] = msg.sender;
         // Increment the counter for when the next NFT is minted.
         _tokenIds.increment();
+        // emit the event
         emit Registered(msg.sender, _name);
     }
 
+    // function to list the nfts
     function sell(uint256 _tokenId, uint256 _price) public {
         require(
             CNames[_tokenId].owner == msg.sender,
             "Only NFT owner can list Item"
         );
         require(_price > 0, "price should be greater than zero");
+        // update the struct
         CName storage editCName = CNames[_tokenId];
         editCName.listed = true;
         editCName.price = _price;
     }
 
+    // function to buy an nft and transfer ownership
     function buyNFT(uint256 _tokenId) public payable {
         require(
             CNames[_tokenId].owner != msg.sender,
@@ -131,13 +137,14 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
             value: msg.value
         }(""); // pay for the nft
         if (success) _transfer(CNames[_tokenId].owner, msg.sender, _tokenId); // transfer nft
-
+        // update the struct
         CName storage buyCName = CNames[_tokenId];
         buyCName.owner = msg.sender;
         buyCName.listed = false;
         buyCName.sold += 1;
     }
 
+    // function to fetch the nfts
     function getNft(uint256 _tokenId)
         public
         view
@@ -159,6 +166,7 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         );
     }
 
+    // function to like the nfts
     function likeNft(uint256 _tokenId) public {
         require(favorited[_tokenId] != msg.sender, "nft already favorited");
         CName storage likeCName = CNames[_tokenId];
@@ -166,10 +174,12 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         favorited[_tokenId] = msg.sender;
     }
 
+    // function to update the struct with the image of the users
     function setAddressAvicon(string memory _imageUri) public {
         imageToAddress[msg.sender] = _imageUri;
     }
 
+    // function to query the mapping for the users' imageUri/avicon
     function getAddressAvicon(address _address)
         public
         view
