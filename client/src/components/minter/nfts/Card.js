@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import {
   Card,
@@ -13,6 +13,7 @@ import {
 import { truncateAddress } from "../../../utils"
 import Identicon from "../../ui/Identicon"
 import BigNumber from "bignumber.js"
+import { hasLiked } from "../../../utils/minter"
 
 const NftCard = ({ nft, minterContract, address, list, like, buy }) => {
   const {
@@ -31,6 +32,16 @@ const NftCard = ({ nft, minterContract, address, list, like, buy }) => {
   const handleShow = () => setShow(true)
   const handleClose = () => setShow(false)
   const isPriceEntered = () => sellPrice
+  const [addr, setAddr] = useState(null)
+  const hasFav = useCallback(async (minterContract, index) => {
+    const fav = await hasLiked(minterContract, index)
+    setAddr(fav)
+  }, [])
+  useEffect(() => {
+    if (index && minterContract) {
+      hasFav(minterContract, index)
+    }
+  }, [index, minterContract, hasFav])
   return (
     <Col key={index}>
       <Card className=' h-100'>
@@ -62,7 +73,9 @@ const NftCard = ({ nft, minterContract, address, list, like, buy }) => {
             </Badge>
           </Stack>
           <Stack direction='horizontal' gap={2}>
-            <Card.Title>{price.shiftedBy(-18).toFixed(2)} Celo</Card.Title>
+            {listed && (
+              <Card.Title>{price.shiftedBy(-18).toFixed(2)} Celo</Card.Title>
+            )}
             <Badge bg='secondary' className='ms-auto'>
               {sold} Transfers
             </Badge>
@@ -119,17 +132,22 @@ const NftCard = ({ nft, minterContract, address, list, like, buy }) => {
             </>
           ) : (
             <>
-              <Button disabled={address === owner} onClick={() => like(index)}>
+              <Button
+                disabled={address === owner || address === addr}
+                onClick={() => like(index)}
+              >
                 {" "}
                 Like
               </Button>
-              <Button
-                disabled={address === owner}
-                onClick={() => buy(index, price)}
-                className='mt-2'
-              >
-                Buy
-              </Button>
+              {listed && (
+                <Button
+                  disabled={address === owner}
+                  onClick={() => buy(index, price)}
+                  className='mt-2'
+                >
+                  Buy
+                </Button>
+              )}
             </>
           )}
         </Card.Body>

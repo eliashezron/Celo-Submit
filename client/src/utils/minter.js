@@ -90,6 +90,14 @@ export const hasAvicon = async (minterContract, user) => {
     console.log({ e })
   }
 }
+export const hasLiked = async (minterContract, index) => {
+  try {
+    let addr = await minterContract.methods.favorited(index).call()
+    return addr
+  } catch (e) {
+    console.log({ e })
+  }
+}
 export const setAvicon = async (minterContract, performActions, ipfsImage) => {
   await performActions(async (kit) => {
     if (!ipfsImage) return
@@ -126,7 +134,7 @@ export const buyCNS = async (
   buyPrice
 ) => {
   await performActions(async (kit) => {
-    if (!index || !buyPrice) return
+    if (!buyPrice) return
     const { defaultAccount } = kit
 
     try {
@@ -141,7 +149,6 @@ export const buyCNS = async (
 }
 export const likeCNS = async (minterContract, performActions, index) => {
   await performActions(async (kit) => {
-    if (!index) return
     const { defaultAccount } = kit
 
     try {
