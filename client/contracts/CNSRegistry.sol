@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 // We first import some OpenZeppelin Contracts.
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -8,13 +8,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
-import "hardhat/console.sol"; // to allow console logging for easier debuging
 
 // We inherit the contracts we imported. This means we'll have access
 // to the inherited contract's methods. So 'is' keyword gives it power
 // to inherit other contracts
 contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
-    // this allows us to help us keep track of tokenIds.
+    // this helps us keep track of tokenIds.
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     struct CName {
@@ -22,12 +21,12 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         bool listed;
         uint256 price;
         uint256 sold;
-        address[] favorites;
+        address[] likes;
     }
-    mapping(uint256 => CName) public CNames; //to keep track of the structs
+    mapping(uint256 => CName) private CNames; //to keep track of the structs
     mapping(string => address) public registeredNames; //to  map the registered names to the owners
-    mapping(uint256 => address) public favorited; // to keep track of those that have already liked an nft
-    mapping(address => string) public imageToAddress; // to map the address/users to the avicons
+    mapping(uint256 => mapping(address => bool)) private liked; // to keep track of those that have already liked an nft
+    mapping(address => string) private imageToAddress; // to map the address/users to the avicons
     event Registered(address indexed who, string name); // emit this upon successfull registration
 
     // This is our SVG code. All we need to change is the name that's displayed. Everything else stays the same.
@@ -41,8 +40,17 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
     // initialising the name and it's symbol of the ERC721 contract.
     constructor() ERC721("ENSRegistry", "ENSR") {}
 
-    // A function used to reserve the CNS names
-    function reserveName(string memory _name, string memory _bgColor) public {
+
+    // modifier to check if CName with id "tokenId" exists
+    modifier exists(uint tokenId){
+        require(_exists(tokenId), "Query of nonexistent CName");
+        _;
+    }
+
+    /// @dev A function used to reserve the CNS names
+    function reserveName(string calldata _name, string calldata _bgColor) public {
+        
+        require(bytes(_name).length > 0, "Empty name");
         // query to see if the name is still available
         require(registeredNames[_name] == address(0), "Name Already taken");
         // if yes, we reconstruct the svg to  include the name and bg color
@@ -55,9 +63,9 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
                 "</text></svg>"
             )
         );
-        //@dev to autofill the .celo extention to the input name
+        // to autofill the .celo extention to the input name
         string memory name = string(abi.encodePacked(_name, ".celo"));
-        // console.log(name)
+
         // Get all the JSON metadata in place and base64 encode it.
         string memory json = Base64.encode( // this whole block encodes our json data into base64
             bytes(
@@ -79,75 +87,69 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         string memory finalTokenUri = string(
             abi.encodePacked("data:application/json;base64,", json) // so here we put it all together
         );
-        /** 
-        console.log(
-            string(
-                abi.encodePacked( // passed it in as a parameter
-                    "https://nftpreview.0xdev.codes/?code=", // with this we can do a quick preview of the image and the contents of the json without deploying it again and again on the opensea testnet
-                    finalTokenUri
-                )
-            )
-        );
-        */
+    
         // Actually mint the NFT to the sender using msg.sender.
         uint256 newTokenId = _tokenIds.current();
+        // Increment the counter for when the next NFT is minted.
+        _tokenIds.increment();
         _safeMint(msg.sender, newTokenId);
 
         //  Updated our URI to be consistent with our Json files
         _setTokenURI(newTokenId, finalTokenUri);
-        // updated the struct
+
+        // update the struct for newTokenId
         CName storage newCName = CNames[newTokenId];
         newCName.owner = msg.sender;
-        newCName.listed = false;
-        newCName.price = 0;
-        newCName.sold = 0;
         registeredNames[_name] = msg.sender;
-        // Increment the counter for when the next NFT is minted.
-        _tokenIds.increment();
+
         // emit the event
         emit Registered(msg.sender, _name);
     }
 
-    // function to list the nfts
-    function sell(uint256 _tokenId, uint256 _price) public {
+    /// @dev function to list the nfts for sale
+    function sellCName(uint256 tokenId, uint256 _price) public exists(tokenId) {
+        
         require(
-            CNames[_tokenId].owner == msg.sender,
+            CNames[tokenId].owner == msg.sender,
             "Only NFT owner can list Item"
         );
         require(_price > 0, "price should be greater than zero");
         // update the struct
-        CName storage editCName = CNames[_tokenId];
+        CName storage editCName = CNames[tokenId];
         editCName.listed = true;
         editCName.price = _price;
     }
 
     // function to buy an nft and transfer ownership
-    function buyNFT(uint256 _tokenId) public payable {
+    function buyCName(uint256 tokenId) public payable exists(tokenId) {
+        CName storage currentCName = CNames[tokenId];
         require(
-            CNames[_tokenId].owner != msg.sender,
+            currentCName.owner != msg.sender,
             "Owner can not buy own item"
         );
-        require(CNames[_tokenId].listed == true, "nft not listed");
+        require(currentCName.listed == true, "CName not listed");
         require(
-            CNames[_tokenId].price <= msg.value,
+            currentCName.price == msg.value,
             "insufficient funds to purchase item"
         );
-
-        (bool success, ) = payable(CNames[_tokenId].owner).call{
-            value: msg.value
-        }(""); // pay for the nft
-        if (success) _transfer(CNames[_tokenId].owner, msg.sender, _tokenId); // transfer nft
+        
+        address owner = currentCName.owner;
         // update the struct
-        CName storage buyCName = CNames[_tokenId];
-        buyCName.owner = msg.sender;
-        buyCName.listed = false;
-        buyCName.sold += 1;
+        // owner and listed values of CName will be updated in _beforeTokenTransfer
+        currentCName.sold += 1;
+        _transfer(owner, msg.sender, tokenId); // transfer CName
+        (bool success, ) = payable(owner).call{
+            value: msg.value
+        }(""); // pay for the CName
+        require(success, "Transfer failed");
+        
     }
 
-    // function to fetch the nfts
-    function getNft(uint256 _tokenId)
+    /// @dev function to fetch a CName
+    function getCName(uint256 tokenId)
         public
         view
+        exists(tokenId)
         returns (
             address,
             bool,
@@ -156,26 +158,28 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
             address[] memory
         )
     {
-        CName storage rCName = CNames[_tokenId];
+        CName storage rCName = CNames[tokenId];
         return (
             rCName.owner,
             rCName.listed,
             rCName.price,
             rCName.sold,
-            rCName.favorites
+            rCName.likes
         );
     }
 
-    // function to like the nfts
-    function likeNft(uint256 _tokenId) public {
-        require(favorited[_tokenId] != msg.sender, "nft already favorited");
-        CName storage likeCName = CNames[_tokenId];
-        likeCName.favorites.push(msg.sender);
-        favorited[_tokenId] = msg.sender;
+    /// @dev function to like the nfts
+    /// @notice you can like a CName only once
+    function likeCName(uint256 tokenId) public exists(tokenId) {
+        require(liked[tokenId][msg.sender] == false, "CName already liked");
+        CName storage currentCName = CNames[tokenId];
+        currentCName.likes.push(msg.sender);
+        liked[tokenId][msg.sender] = true;
     }
 
-    // function to update the struct with the image of the users
-    function setAddressAvicon(string memory _imageUri) public {
+    /// @dev function to update the struct with the image of the users
+    function setAddressAvicon(string calldata _imageUri) public {
+        require(bytes(_imageUri).length > 0, "Empty image uri");
         imageToAddress[msg.sender] = _imageUri;
     }
 
@@ -185,17 +189,25 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         view
         returns (string memory)
     {
-        string memory _imageUri = imageToAddress[_address];
-        return _imageUri;
+        
+        return imageToAddress[_address];
+    }
+
+    function getLiked(uint tokenId) public view exists(tokenId) returns(bool){
+        return liked[tokenId][msg.sender];
     }
 
     // The following functions are overrides required by Solidity.
 
+    // owner and listed values of CName are updated upon transfer of the NFT representing the CName
     function _beforeTokenTransfer(
         address from,
         address to,
         uint256 tokenId
     ) internal override(ERC721, ERC721Enumerable) {
+        CName storage currentCName = CNames[tokenId];
+        currentCName.owner = to;
+        currentCName.listed = false;
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
