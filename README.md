@@ -28,7 +28,7 @@ Home page UI design inspired [Heizal](https://github.com/Heizal)
 
 ## Live Demo
 
-Checkout the Live Demo Of the Project Hear [CELO NAME SERVICE](https://still-sound-3479.on.fleek.co/)
+Checkout the Live Demo Of the Project Hear [CELO NAME SERVICE](https://celonameservice.netlify.app/)
 
 ## Usage
 
