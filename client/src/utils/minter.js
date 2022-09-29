@@ -5,6 +5,8 @@ const client = new Web3Storage({
   token:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEE0MDk2MjJERmU3MDZjNzY3OUExOUM5NzU4Qjc3QzJmN2E4MjlkOTUiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NjIwMjg2MjQwNzYsIm5hbWUiOiJjZWxvTmZ0RGVtbyJ9.VbInbK1Ud2MHgzuOEmgHH-VWQq7XJv9Q0-gdvC-wOOA",
 })
+const format_data = (uri) =>
+  JSON.parse(atob(uri.split("base64,")[1]).replaceAll("'", '"'))
 
 export const createNft = async (
   minterContract,
@@ -16,7 +18,6 @@ export const createNft = async (
     if (!name || !color) return
     const { defaultAccount } = kit
     try {
-      // mint the NFT and save the IPFS url to the blockchain
       let transaction = await minterContract.methods
         .reserveName(name, color)
         .send({ from: defaultAccount })
@@ -42,8 +43,7 @@ export const uploadFileToWebStorage = async (e) => {
 
   return `https://ipfs.io/ipfs/${files[0].cid}`
 }
-const format_data = (uri) =>
-  JSON.parse(atob(uri.split("base64,")[1]).replaceAll("'", '"'))
+
 export const getNfts = async (minterContract) => {
   try {
     const nfts = []
@@ -52,7 +52,9 @@ export const getNfts = async (minterContract) => {
       const nft = new Promise(async (resolve) => {
         const res = await minterContract.methods.tokenURI(i).call()
         const getProps = await minterContract.methods.getNft(i).call()
+        // formats the base64 returned data
         const data = await format_data(res)
+        //returns owner of a particular nft
         const owner = await await minterContract.methods.ownerOf(i).call()
         resolve({
           index: i,
@@ -69,15 +71,6 @@ export const getNfts = async (minterContract) => {
       nfts.push(nft)
     }
     return Promise.all(nfts)
-  } catch (e) {
-    console.log({ e })
-  }
-}
-export const fetchNftMeta = async (ipfsUrl) => {
-  try {
-    if (!ipfsUrl) return null
-    const meta = await axios.get(ipfsUrl)
-    return meta
   } catch (e) {
     console.log({ e })
   }

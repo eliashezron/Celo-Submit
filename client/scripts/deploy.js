@@ -9,7 +9,7 @@ async function main() {
   console.log("MyNFT deployed to:", myCNS.address)
   storeContractData(myCNS)
 }
-
+//function to store contract data in the src folder, source data include the abi and contract addresss
 function storeContractData(contract) {
   const fs = require("fs")
   const contractsDir = __dirname + "/../src/contracts"
