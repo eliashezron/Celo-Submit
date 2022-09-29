@@ -38,7 +38,7 @@ const NftCard = ({ nft, minterContract, address, list, like, buy }) => {
     setAddr(fav)
   }, [])
   useEffect(() => {
-    if (index && minterContract) {
+    if (index === 0 || (index && minterContract)) {
       hasFav(minterContract, index)
     }
   }, [index, minterContract, hasFav])
@@ -67,16 +67,22 @@ const NftCard = ({ nft, minterContract, address, list, like, buy }) => {
 
         <Card.Body className='d-flex  flex-column text-center'>
           <Stack direction='horizontal' gap={2}>
-            <Card.Title>{name}</Card.Title>
-            <Badge bg='secondary' className='ms-auto'>
+            <Card.Title className='font-monospace text-bold'>{name}</Card.Title>
+            <Badge bg='success' className='ms-auto'>
               {favorites} Likes
             </Badge>
           </Stack>
           <Stack direction='horizontal' gap={2}>
-            {listed && (
-              <Card.Title>{price.shiftedBy(-18).toFixed(2)} Celo</Card.Title>
+            {listed ? (
+              <Card.Title className='font-monospace text-secondary text-bold'>
+                {price.shiftedBy(-18).toFixed(2)} Celo
+              </Card.Title>
+            ) : (
+              <Card.Title>
+                <Badge bg='warning'>Not Listed</Badge>
+              </Card.Title>
             )}
-            <Badge bg='secondary' className='ms-auto'>
+            <Badge bg='primary' className='ms-auto'>
               {sold} Transfers
             </Badge>
           </Stack>
