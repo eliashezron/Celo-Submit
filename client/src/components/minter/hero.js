@@ -13,6 +13,7 @@ import {
 } from "@coreui/react"
 import { cilMediaPlay } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
+import coverImg from "../../assets/img/latest_nft.png"
 
 const HeroSection = ({ connect }) => {
   return (
@@ -20,7 +21,7 @@ const HeroSection = ({ connect }) => {
       {/* HERO TEXT */}
       <CContainer className='hero_left'>
         <h1 className='main_text'>
-          Discover, collect, and sell <br></br> extraordinary NFTs
+          CELO NAME SERVICE <br></br> extraordinary NFTs
         </h1>
         <h2 className='muted_text'>
           CNS is the world's first and <br></br>largest Celo Identity
@@ -45,20 +46,12 @@ const HeroSection = ({ connect }) => {
 
       {/* HERO IMAGE */}
       <CCard className='hero_card' href='#nft'>
-        <CCardImage
-          orientation='top'
-          src='https://images.pexels.com/photos/9904214/pexels-photo-9904214.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'
-          className='hero_img'
-        />
+        <CCardImage orientation='top' src={coverImg} className='hero_img' />
         <CCardBody className='heroSection_card'>
           <CCardText>
-            <CImage
-              fluid
-              src='https://images.pexels.com/photos/9904214/pexels-photo-9904214.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'
-              className='hero_profile'
-            />
+            <CImage fluid src={coverImg} className='hero_profile' />
             <CCardTitle className='card_box'>
-              <h2 className='art_name'>EliasHEZRON.celo</h2>
+              <h2 className='art_name'>xyz.celo</h2>
               <h2 className='profile_name'>elias</h2>
               <CTooltip content='Get featured on the homepage' placement='top'>
                 <CImage

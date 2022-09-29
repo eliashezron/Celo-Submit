@@ -1,6 +1,6 @@
 # Dacade Nft Collection
 
-![](img/imgNft.jpg)
+![](img/celo.jpg)
 
 ## Description
 

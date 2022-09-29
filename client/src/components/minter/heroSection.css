@@ -1,8 +1,8 @@
 .hero_card{
 	width: 43%;
-	height: 60%;
+	height: 50%;
 	margin-left: 690px;
-	bottom: 450px;
+	bottom: 550px;
 	cursor: pointer;
 	border-radius: 15px;
 	position: relative;
@@ -12,7 +12,7 @@
 
 .hero_section{
 	position: absolute;
-	background-image: url("https://images.pexels.com/photos/2395253/pexels-photo-2395253.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500");
+	background-image: url("../../assets/img/latest_nft1.png");
 	background-repeat: no-repeat;
     background-size: 100% 60%;
 	border-bottom: none;
