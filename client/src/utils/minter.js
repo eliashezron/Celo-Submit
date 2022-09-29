@@ -1,5 +1,4 @@
 import { Web3Storage } from "web3.storage/dist/bundle.esm.min.js"
-import axios from "axios"
 import BigNumber from "bignumber.js"
 const client = new Web3Storage({
   token:
