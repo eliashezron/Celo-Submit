@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import PropTypes from "prop-types"
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap"
-import { uploadFileToWebStorage } from "../../../utils/minter"
+import { nameTaken, uploadFileToWebStorage } from "../../../utils/minter"
 import { hasAvicon } from "../../../utils/minter"
 
 const COLORS = [
@@ -25,12 +25,22 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
   const [color, setColor] = useState("")
   const [show, setShow] = useState(false)
   const [avi, setAvi] = useState(null)
+  const [taken, setTaken] = useState(null)
   const getUserAvi = useCallback(async (minterContract, address) => {
     // get the address that deployed the NFT contract
     const avicon = await hasAvicon(minterContract, address)
     setAvi(avicon)
     // eslint-disable-next-line
   }, [])
+  const nameAlreadyTaken = useCallback(async (minterContract, name) => {
+    const txr = await nameTaken(minterContract, name)
+    if (txr !== "0x0000000000000000000000000000000000000000") setTaken(txr)
+  }, [])
+  useEffect(() => {
+    if (name && minterContract) {
+      nameAlreadyTaken(minterContract, name)
+    }
+  }, [name, minterContract, nameAlreadyTaken])
   useEffect(() => {
     if (address && minterContract) {
       getUserAvi(minterContract, address)
@@ -110,13 +120,15 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
           <Modal.Body>
             <Form>
               <FloatingLabel
-                controlId='inputLocation'
-                label='Name'
+                controlId='inputName'
+                label={
+                  name && taken ? `${name} already Taken` : "Name to reserve"
+                }
                 className='mb-3'
               >
                 <Form.Control
                   type='text'
-                  placeholder='Name of NFT'
+                  placeholder='name to reserve'
                   onChange={(e) => {
                     setName(e.target.value.replaceAll(" ", ""))
                   }}
@@ -156,7 +168,7 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
             </Button>
             <Button
               variant='dark'
-              disabled={!isFormFilled()}
+              disabled={!isFormFilled() || taken}
               onClick={() => {
                 save(name, color)
                 handleClose()

@@ -98,6 +98,14 @@ export const hasLiked = async (minterContract, index) => {
     console.log({ e })
   }
 }
+export const nameTaken = async (minterContract, name) => {
+  try {
+    let addr = await minterContract.methods.registeredNames(name).call()
+    return addr
+  } catch (e) {
+    console.log({ e })
+  }
+}
 export const setAvicon = async (minterContract, performActions, ipfsImage) => {
   await performActions(async (kit) => {
     if (!ipfsImage) return
