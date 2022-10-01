@@ -1,6 +1,6 @@
 # CELO NAME SERVICE MARKETPLACE
 
-![](img/celo.jpg)
+![](img/imgC.jpg)
 
 ## Description
 
