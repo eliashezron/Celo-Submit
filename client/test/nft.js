@@ -36,12 +36,12 @@ describe("test", function () {
     const tx = await myCNS.connect(owner).reserveName("elias", "blue")
     await tx.wait()
 
-    await expect(myCNS.connect(acc1).sell(0, 2)).to.be.revertedWith(
+    await expect(myCNS.connect(acc1).sellCName(0, 2)).to.be.revertedWith(
       "Only NFT owner can list Item"
     )
-    const tx1 = await myCNS.connect(owner).sell(0, 3)
+    const tx1 = await myCNS.connect(owner).sellCName(0, 3)
     await tx1.wait()
-    const tx2 = await myCNS.connect(owner).getNft(0)
+    const tx2 = await myCNS.connect(owner).getCName(0)
     expect(tx2[1]).to.equal(true)
     expect(tx2[2]).to.equal(3)
     expect(tx2[3]).to.equal(0)
@@ -49,13 +49,13 @@ describe("test", function () {
   it("can like nft", async function () {
     const tx = await myCNS.connect(owner).reserveName("elias", "blue")
     await tx.wait()
-    const tx1 = await myCNS.connect(acc1).likeNft(0)
+    const tx1 = await myCNS.connect(acc1).likeCName(0)
     await tx1.wait()
 
-    await expect(myCNS.connect(acc1).likeNft(0)).to.be.revertedWith(
-      "nft already favorited"
+    await expect(myCNS.connect(acc1).likeCName(0)).to.be.revertedWith(
+      "CName already liked"
     )
-    const tx2 = await myCNS.connect(owner).getNft(0)
+    const tx2 = await myCNS.connect(owner).getCName(0)
     expect(tx2[4].length).to.equal(1)
     expect(tx2[4][0]).to.equal(acc1.address)
   })
@@ -74,19 +74,19 @@ describe("test", function () {
   it("only owner can sell", async function () {
     const tx = await myCNS.connect(owner).reserveName("elias", "blue")
     await tx.wait()
-    const tx0 = await myCNS.connect(owner).getNft(0)
+    const tx0 = await myCNS.connect(owner).getCName(0)
     expect(tx0[0]).to.equal(owner.address)
-    await expect(myCNS.connect(acc1).buyNFT(0)).to.be.revertedWith(
-      "nft not listed"
+    await expect(myCNS.connect(acc1).buyCName(0)).to.be.revertedWith(
+      "CName not listed"
     )
-    const tx1 = await myCNS.connect(owner).sell(0, 2)
+    const tx1 = await myCNS.connect(owner).sellCName(0, 2)
     await tx1.wait()
-    await expect(myCNS.connect(owner).buyNFT(0)).to.be.revertedWith(
+    await expect(myCNS.connect(owner).buyCName(0)).to.be.revertedWith(
       "Owner can not buy own item"
     )
-    const txy = await myCNS.connect(acc1).buyNFT(0, { value: 2 })
+    const txy = await myCNS.connect(acc1).buyCName(0, { value: 2 })
     await txy.wait()
-    const tx2 = await myCNS.connect(owner).getNft(0)
+    const tx2 = await myCNS.connect(owner).getCName(0)
     expect(tx2[0]).to.equal(acc1.address)
     expect(tx2[1]).to.equal(false)
     expect(tx2[3]).to.equal(1)

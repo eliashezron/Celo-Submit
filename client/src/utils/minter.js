@@ -50,7 +50,7 @@ export const getNfts = async (minterContract) => {
     for (let i = 0; i < Number(nftsLength); i++) {
       const nft = new Promise(async (resolve) => {
         const res = await minterContract.methods.tokenURI(i).call()
-        const getProps = await minterContract.methods.getNft(i).call()
+        const getProps = await minterContract.methods.getCName(i).call()
         // formats the base64 returned data
         const data = await format_data(res)
         //returns owner of a particular nft
@@ -92,7 +92,7 @@ export const hasAvicon = async (minterContract, user) => {
 }
 export const hasLiked = async (minterContract, index) => {
   try {
-    let addr = await minterContract.methods.favorited(index).call()
+    let addr = await minterContract.methods.liked(index).call()
     return addr
   } catch (e) {
     console.log({ e })
@@ -127,7 +127,7 @@ export const listCNS = async (minterContract, performActions, index, Price) => {
 
     try {
       let tx = await minterContract.methods
-        .sell(index, Price)
+        .sellCName(index, Price)
         .send({ from: defaultAccount })
       return tx
     } catch (e) {
@@ -147,7 +147,7 @@ export const buyCNS = async (
 
     try {
       let tx = await minterContract.methods
-        .buyNFT(index)
+        .buyCName(index)
         .send({ from: defaultAccount, value: buyPrice })
       return tx
     } catch (e) {
@@ -161,7 +161,7 @@ export const likeCNS = async (minterContract, performActions, index) => {
 
     try {
       let tx = await minterContract.methods
-        .likeNft(index)
+        .likeCName(index)
         .send({ from: defaultAccount })
       return tx
     } catch (e) {
