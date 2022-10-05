@@ -82,7 +82,8 @@ const AddNfts = ({ save, uploadImage, address, minterContract }) => {
                   type='file'
                   className={"mb-3"}
                   onChange={async (e) => {
-                    const imageUrl = await uploadFileToWebStorage(e)
+                    const image = e.target.files
+                    const imageUrl = await uploadFileToWebStorage(image)
                     if (!imageUrl) {
                       alert("failed to upload image")
                       return
