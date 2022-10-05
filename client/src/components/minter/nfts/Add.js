@@ -8,7 +8,7 @@ const COLORS = [
   "Black",
   "Red",
   "Green",
-  "Grimson",
+  "purple",
   "indigo",
   "Aqua",
   "Brown",
