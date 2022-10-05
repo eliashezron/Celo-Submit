@@ -28,10 +28,10 @@ export const createNft = async (
   })
 }
 // ...
-export const uploadFileToWebStorage = async (e) => {
+export const uploadFileToWebStorage = async (file) => {
   // Construct with token and endpoint
 
-  const file = e.target.files[0]
+  
   if (!file) return
   // Pack files into a CAR and send to web3.storage
   const rootCid = await client.put(file) // Promise<CIDString>
