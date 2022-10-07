@@ -41,8 +41,29 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
     // initialising the name and it's symbol of the ERC721 contract.
     constructor() ERC721("ENSRegistry", "ENSR") {}
 
+    modifier onlyOwner(uint256 _tokenId){
+        require(
+            msg.sender == CNames[_tokenId].owner, 
+            "only the owner can acess this functionality"
+        );
+        _;
+    }
+
+    modifier validValue(uint256 _value){
+        require(
+        _value > 0, 
+        "price should be greater than zero"
+        );
+        _;
+    }
+
+    modifier validInput(bytes memory _input){
+        require(_input.length > 0, "invalid input");
+        _;
+    }
+
     // A function used to reserve the CNS names
-    function reserveName(string memory _name, string memory _bgColor) public {
+    function reserveName(string memory _name, string memory _bgColor) public validInput(bytes(_name)){
         // query to see if the name is still available
         require(registeredNames[_name] == address(0), "Name Already taken");
         // if yes, we reconstruct the svg to  include the name and bg color
@@ -109,11 +130,7 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
     }
 
     // function to list the nfts
-    function sell(uint256 _tokenId, uint256 _price) public {
-        require(
-            CNames[_tokenId].owner == msg.sender,
-            "Only NFT owner can list Item"
-        );
+    function sell(uint256 _tokenId, uint256 _price) public onlyOwner(_tokenId) validValue(_price){
         require(_price > 0, "price should be greater than zero");
         // update the struct
         CName storage editCName = CNames[_tokenId];
@@ -129,8 +146,8 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         );
         require(CNames[_tokenId].listed == true, "nft not listed");
         require(
-            CNames[_tokenId].price <= msg.value,
-            "insufficient funds to purchase item"
+            CNames[_tokenId].price == msg.value,
+            "Send correct Value"
         );
 
         (bool success, ) = payable(CNames[_tokenId].owner).call{
@@ -142,6 +159,24 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
         buyCName.owner = msg.sender;
         buyCName.listed = false;
         buyCName.sold += 1;
+    }
+
+    function changePrice(uint256 _tokenId, uint256 _price)public onlyOwner(_tokenId) validValue(_price){
+        CNames[_tokenId].price = _price;
+    }
+
+
+    // function to like the nfts
+    function likeNft(uint256 _tokenId) public {
+        require(favorited[_tokenId] != msg.sender, "nft already favorited");
+        CName storage likeCName = CNames[_tokenId];
+        likeCName.favorites.push(msg.sender);
+        favorited[_tokenId] = msg.sender;
+    }
+
+    // function to update the struct with the image of the users
+    function setAddressAvicon(string memory _imageUri) public validInput(bytes(_imageUri)){
+        imageToAddress[msg.sender] = _imageUri;
     }
 
     // function to fetch the nfts
@@ -165,20 +200,6 @@ contract CNSRegistry is ERC721, ERC721Enumerable, ERC721URIStorage {
             rCName.favorites
         );
     }
-
-    // function to like the nfts
-    function likeNft(uint256 _tokenId) public {
-        require(favorited[_tokenId] != msg.sender, "nft already favorited");
-        CName storage likeCName = CNames[_tokenId];
-        likeCName.favorites.push(msg.sender);
-        favorited[_tokenId] = msg.sender;
-    }
-
-    // function to update the struct with the image of the users
-    function setAddressAvicon(string memory _imageUri) public {
-        imageToAddress[msg.sender] = _imageUri;
-    }
-
     // function to query the mapping for the users' imageUri/avicon
     function getAddressAvicon(address _address)
         public
