@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/Celo_Submit/static/css/main.8078494e.chunk.css",
+    "main.js": "/Celo_Submit/static/js/main.57a10cc6.chunk.js",
+    "main.js.map": "/Celo_Submit/static/js/main.57a10cc6.chunk.js.map",
+    "runtime-main.js": "/Celo_Submit/static/js/runtime-main.10a52398.js",
+    "runtime-main.js.map": "/Celo_Submit/static/js/runtime-main.10a52398.js.map",
+    "static/css/2.2c070baf.chunk.css": "/Celo_Submit/static/css/2.2c070baf.chunk.css",
+    "static/js/2.3dcb02f2.chunk.js": "/Celo_Submit/static/js/2.3dcb02f2.chunk.js",
+    "static/js/2.3dcb02f2.chunk.js.map": "/Celo_Submit/static/js/2.3dcb02f2.chunk.js.map",
+    "static/js/3.fbf2ab10.chunk.js": "/Celo_Submit/static/js/3.fbf2ab10.chunk.js",
+    "static/js/3.fbf2ab10.chunk.js.map": "/Celo_Submit/static/js/3.fbf2ab10.chunk.js.map",
+    "index.html": "/Celo_Submit/index.html",
+    "static/css/2.2c070baf.chunk.css.map": "/Celo_Submit/static/css/2.2c070baf.chunk.css.map",
+    "static/css/main.8078494e.chunk.css.map": "/Celo_Submit/static/css/main.8078494e.chunk.css.map",
+    "static/js/2.3dcb02f2.chunk.js.LICENSE.txt": "/Celo_Submit/static/js/2.3dcb02f2.chunk.js.LICENSE.txt",
+    "static/media/bootstrap-icons.css": "/Celo_Submit/static/media/bootstrap-icons.ea98e12d.woff2",
+    "static/media/latest_nft.a383698a.png": "/Celo_Submit/static/media/latest_nft.a383698a.png",
+    "static/media/heroSection.css": "/Celo_Submit/static/media/latest_nft1.f81e9bec.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.10a52398.js",
+    "static/css/2.2c070baf.chunk.css",
+    "static/js/2.3dcb02f2.chunk.js",
+    "static/css/main.8078494e.chunk.css",
+    "static/js/main.57a10cc6.chunk.js"
+  ]
+}
