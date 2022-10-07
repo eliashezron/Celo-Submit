@@ -1,4 +1,5 @@
 {
+  "homepage": "https://eliashezron.github.io/Celo_Submit",
   "name": "cnsregistry",
   "version": "0.1.0",
   "private": true,
@@ -36,8 +37,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "compile": "npx hardhat compile",
-    "deploy": "npx hardhat run --network alfajores scripts/deploy.js",
-    "test-contract": "npx hardhat test"
+    "deploy-hardhat": "npx hardhat run --network alfajores scripts/deploy.js",
+    "test-contract": "npx hardhat test",
+    "deploy": "gh-pages -d build",
+    "predeploy": "npm run build"
   },
   "eslintConfig": {
     "extends": [
